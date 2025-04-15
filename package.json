@@ -1,0 +1,17 @@
+{
+  "name": "ekzzzserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/xyzqwefd/Yunzai"
+  },
+  "private": true,
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}
