@@ -8,10 +8,35 @@
 ```bash
 pnpm i && node .
 ```
+3.handler参考构建  
+```
+
+export class Handler extends plugin {
+  constructor() {
+    super({
+      name: '',
+      namespace: 'API',
+      priority: Infinity,
+      handler: [{
+        key: 'mys.req.err',
+        fn: 'mysReqErrHandler'
+      }]
+    })
+  }
+
+async mysReqErrHandler(e, args, reject) {
+/*
+  在此处请求你的自建API即可.
+  传入CK和需要查询的API地址.
+*/
+  }
+}
+
+```
 ### 潜在问题与免责声明  
 1.使用此服务端后ZZZ插件处仍然需要扫码登录，本handler服务端仅在Mys报错后生效，请确保多个handler存在时**最后**调用本服务端.  
-2.不能保证你的handler不与其它handler冲突，介意请慎用，或自行做出修改.  
-3.本服务端需要传入用户CK，请自行搭建并避免使用所谓的公共/公益服务端.  
+2.如果你有多个handler ,则不能保证你的handler不与其它handler冲突，介意请慎用，或自行做出修改.  
+3.本服务端需要传入用户CK，请自行搭建并避免使用所谓的**公共**/**公益**服务端.  
 4.如有Bug请通过issues反馈.  
 
 ### 致谢  
