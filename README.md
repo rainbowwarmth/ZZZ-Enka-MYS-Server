@@ -1,4 +1,4 @@
-### 一种基于EnkaZZZ API的Yunzai ZZZ-Plugin面板更新外置handler服务端  
+### 一种基于EnkaZZZ API的Yunzai ZZZ-Plugin外置面板更新handler服务端  
 ### 原理  
 在MYS API更新ZZZ面板报错时候，作为Handler处理报错，转发请求到本服务端，本服务端通过EnkaZZZ API获取数据并尝试对其MYS数据字段以期达到面板更新纸目的。  
 
@@ -15,6 +15,6 @@ pnpm i && node .
 4.如有Bug请通过issues反馈.  
 
 ### 致谢  
-[ZZZuid](https://github.com/ZZZure/ZZZeroUID)  
-[Enka.network](Enka.network)  
-[ZZZ-plugin](https://github.com/ZZZure/ZZZ-Plugin)  
+1.[ZZZuid](https://github.com/ZZZure/ZZZeroUID)  
+2.[Enka.network](Enka.network)  
+3.[ZZZ-plugin](https://github.com/ZZZure/ZZZ-Plugin)  
