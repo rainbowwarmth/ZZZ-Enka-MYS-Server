@@ -8,7 +8,7 @@
 ```bash
 pnpm i && node .
 ```
-3.handler参考构建  
+3.handler[参考构建](https://github.com/XuF163/ZZZ-Enka-MYS-Server/blob/master/%E6%94%BEexample%E4%B8%8B%E9%9D%A2.js)  
 ```  
 export class Handler extends plugin { //丢example里即可  
   constructor() {
