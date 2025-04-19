@@ -1,4 +1,4 @@
-### 一种基于EnkaZZZ API的Yunzai ZZZ-Plugin外置面板更新handler服务端  
+### 一种基于EnkaZZZ API的Yunzai ZZZ-Plugin面向设备🐎的、适用于handler形式的外置面板更新服务端  
 ### 原理  
 在MYS API更新ZZZ面板报错时候，作为Handler处理报错，转发请求到本服务端，本服务端通过EnkaZZZ API获取数据并尝试对其MYS数据字段以期达到面板更新纸目的。  
 
@@ -32,11 +32,14 @@ async mysReqErrHandler(e, args, reject) {
 }
 
 ```
+### 使用说明  
+4.19 已经实现较为准确的圣遗物/角色属性转换能力，仅测试过有CK且未**绑定设备**时候的**%更新面板**以及具体角色面板查询能力.  
+
 ### 潜在问题与免责声明  
 1.使用此服务端后ZZZ插件处仍然需要扫码登录，本handler服务端仅在Mys报错后生效，请确保多个handler存在时**最后**调用本服务端.  
 2.如果你有多个handler ,则不能保证你的handler不与其它handler冲突，介意请慎用，或自行做出修改.  
 3.本服务端需要传入用户CK，请自行搭建并避免使用所谓的**公共**/**公益**服务端.  
-4.如有Bug请通过issues反馈.  
+4.本仓库仅供测试用途，将于插件本体实现Enka面板更新能力后archive，亦不会随绝区零新版本更新任何json文件.  
 
 ### 致谢  
 1.[ZZZuid](https://github.com/ZZZure/ZZZeroUID)  
