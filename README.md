@@ -1,9 +1,7 @@
 ### 一种基于EnkaZZZ API的Yunzai ZZZ-Plugin面向设备🐎的、适用于handler形式的外置面板更新服务端  
 ### 简介  
 在MYS API更新ZZZ面板报错时候，作为Handler处理报错，转发请求到本服务端，本服务端通过EnkaZZZ API获取数据并尝试对其MYS数据字段以期达到面板更新纸目的。    
-![41bb8d4d94d2f2a6e98f7797759fb777](https://github.com/user-attachments/assets/c4a1f06b-1052-470f-b183-517e5caabe96)
-![57903b5bb02398ad0e0b3f9279b9c637](https://github.com/user-attachments/assets/8f740766-74aa-427d-86d1-7eddef605447)
-演示
+效果展示请[查看](#section1) 
 ### 使用方法
 1. 在你的handler.js中，请求目标url修改为为你部署此服务端的地址（e.g ip+端口+路径)  
 2.安装本项目依赖并运行  
@@ -47,3 +45,8 @@ async mysReqErrHandler(e, args, reject) {
 1.[ZZZuid](https://github.com/ZZZure/ZZZeroUID)  
 2.[Enka.network](Enka.network)  
 3.[ZZZ-plugin](https://github.com/ZZZure/ZZZ-Plugin)  
+
+### 精度展示  
+<a id="section1"></a>
+![41bb8d4d94d2f2a6e98f7797759fb777](https://github.com/user-attachments/assets/c4a1f06b-1052-470f-b183-517e5caabe96)
+![57903b5bb02398ad0e0b3f9279b9c637](https://github.com/user-attachments/assets/8f740766-74aa-427d-86d1-7eddef605447)
