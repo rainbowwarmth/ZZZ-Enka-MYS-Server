@@ -4,7 +4,7 @@ name: Build and Release Executables
 on:
   push:
     branches:
-      - main # 当代码推送到 main 分支时触发构建
+      - master # 当代码推送到 main 分支时触发构建
     tags:
       - 'v*' # 当推送以 'v' 开头的标签时触发构建和发布
   pull_request:
