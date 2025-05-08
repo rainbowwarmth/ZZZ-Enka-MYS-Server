@@ -1,0 +1,92 @@
+name: Build Executables
+
+on:
+  push:
+    branches:
+      - main # 当代码推送到 main 分支时触发
+  pull_request:
+    branches:
+      - main # 当有拉取请求到 main 分支时触发
+  workflow_dispatch: # 允许手动触发工作流程
+
+jobs:
+  build-windows:
+    runs-on: windows-latest # 在最新的 Windows 运行器上执行
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 # 检出代码
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18 # 指定使用的 Node.js 版本，与你的 pkg targets 保持一致
+
+      - name: Install dependencies
+        run: npm install # 或 yarn install
+
+      - name: Install pkg globally
+        run: npm install -g pkg # 或者如果在 package.json 中作为 devDependency 安装，则不需要全局安装
+
+      - name: Build Windows executable
+        run: pkg . -t node18-win-x64 # 使用 pkg 打包 Windows 64位可执行文件
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: your-app-windows
+          path: ./your-app-win.exe # 替换为你的可执行文件名称和路径
+
+  build-macos:
+    runs-on: macos-latest # 在最新的 macOS 运行器上执行
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install pkg globally
+        run: npm install -g pkg
+
+      - name: Build macOS executable
+        run: pkg . -t node18-macos-x64 # 使用 pkg 打包 macOS 64位可执行文件
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: your-app-macos
+          path: ./your-app-macos # 替换为你的可执行文件名称和路径
+
+  build-linux:
+    runs-on: ubuntu-latest # 在最新的 Ubuntu 运行器上执行
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install pkg globally
+        run: npm install -g pkg
+
+      - name: Build Linux executable
+        run: pkg . -t node18-linux-x64 # 使用 pkg 打包 Linux 64位可执行文件
+
+      - name: Upload Linux artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: your-app-linux
+          path: ./your-app-linux # 替换为你的可执行文件名称和路径
