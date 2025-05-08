@@ -1,18 +1,25 @@
-name: Build Executables
+name: Build and Release Executables
 
+# 定义触发工作流程的事件
 on:
   push:
     branches:
-      - main # 当代码推送到 main 分支时触发
+      - main # 当代码推送到 main 分支时触发构建
+    tags:
+      - 'v*' # 当推送以 'v' 开头的标签时触发构建和发布
   pull_request:
     branches:
-      - main # 当有拉取请求到 main 分支时触发
+      - main # 当有拉取请求到 main 分支时触发构建 (不发布)
   workflow_dispatch: # 允许手动触发工作流程
 
 jobs:
-  build-windows:
-    runs-on: windows-latest # 在最新的 Windows 运行器上执行
+  # ==================================================
+  # 构建 Job：在不同平台上构建可执行文件并上传 Artifact
+  # ==================================================
 
+  build-windows:
+    name: Build on Windows
+    runs-on: windows-latest # 在最新的 Windows 运行器上执行
     steps:
       - name: Checkout code
         uses: actions/checkout@v4 # 检出代码
@@ -20,26 +27,28 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18 # 指定使用的 Node.js 版本，与你的 pkg targets 保持一致
+          node-version: 18 # 指定使用的 Node.js 版本，请与你的项目兼容
 
       - name: Install dependencies
         run: npm install # 或 yarn install
 
-      - name: Install pkg globally
-        run: npm install -g pkg # 或者如果在 package.json 中作为 devDependency 安装，则不需要全局安装
-
+      # 假设你在 package.json 中配置了 pkg，并且设置了 bin 字段
+      # 如果没有，请修改下面的命令为 pkg your_entry_file.js -t node18-win-x64
       - name: Build Windows executable
-        run: pkg . -t node18-win-x64 # 使用 pkg 打包 Windows 64位可执行文件
+        run: npm install -g pkg && pkg . -t node18-win-x64 # 如果 pkg 是 devDependency，可省略全局安装部分并使用 npm run your-pkg-script
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
-          name: your-app-windows
-          path: ./your-app-win.exe # 替换为你的可执行文件名称和路径
+          name: your-app-windows # Artifact 的名称
+          # 请根据你的 pkg 配置调整路径。如果 pkg . 生成的可执行文件在当前目录，名称为 package.json 的 name + -win.exe
+          path: |
+            ./your-app-win.exe # 替换为你的 Windows 可执行文件实际路径和名称
+            # 如果有其他需要一起打包上传的 Windows 相关文件，也可以添加到这里
 
   build-macos:
+    name: Build on macOS
     runs-on: macos-latest # 在最新的 macOS 运行器上执行
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -52,21 +61,22 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install pkg globally
-        run: npm install -g pkg
-
+      # 假设你在 package.json 中配置了 pkg
       - name: Build macOS executable
-        run: pkg . -t node18-macos-x64 # 使用 pkg 打包 macOS 64位可执行文件
+        run: npm install -g pkg && pkg . -t node18-macos-x64 # 或使用 npm run your-pkg-script
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
-          name: your-app-macos
-          path: ./your-app-macos # 替换为你的可执行文件名称和路径
+          name: your-app-macos # Artifact 的名称
+          # 请根据你的 pkg 配置调整路径。如果 pkg . 生成的可执行文件在当前目录，名称为 package.json 的 name + -macos
+          path: |
+            ./your-app-macos # 替换为你的 macOS 可执行文件实际路径和名称
+            # 如果有其他需要一起打包上传的 macOS 相关文件，也可以添加到这里
 
   build-linux:
+    name: Build on Linux
     runs-on: ubuntu-latest # 在最新的 Ubuntu 运行器上执行
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -79,14 +89,71 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install pkg globally
-        run: npm install -g pkg
-
+      # 假设你在 package.json 中配置了 pkg
       - name: Build Linux executable
-        run: pkg . -t node18-linux-x64 # 使用 pkg 打包 Linux 64位可执行文件
+        run: npm install -g pkg && pkg . -t node18-linux-x64 # 或使用 npm run your-pkg-script
 
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
-          name: your-app-linux
-          path: ./your-app-linux # 替换为你的可执行文件名称和路径
+          name: your-app-linux # Artifact 的名称
+          # 请根据你的 pkg 配置调整路径。如果 pkg . 生成的可执行文件在当前目录，名称为 package.json 的 name + -linux
+          path: |
+            ./your-app-linux # 替换为你的 Linux 可执行文件实际路径和名称
+            # 如果有其他需要一起打包上传的 Linux 相关文件，也可以添加到这里
+
+  # ==================================================
+  # 发布 Job：下载 Artifact 并创建 GitHub Release
+  # ==================================================
+
+  release:
+    name: Create Release
+    # 确保 Release Job 在所有构建 Job 成功后才运行
+    needs: [build-windows, build-macos, build-linux]
+    runs-on: ubuntu-latest # Release Job 可以在任意支持的运行器上运行
+    # 仅当触发事件是推送标签时运行此 Job
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        # 如果你需要在 Release 描述中包含提交信息等，需要检出代码
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts # 将下载的 Artifact 存放到一个名为 artifacts 的文件夹中
+
+      - name: List downloaded artifacts (for debugging)
+        run: ls -R ./artifacts # 列出下载的文件，方便调试查看路径
+
+      - name: Create Release
+        id: create_release
+        # 使用一个流行的创建 Release 的 Action
+        uses: softprops/action-gh-release@v2
+        with:
+          # Release 的名称，默认为标签名 (例如 v1.0.0)
+          # name: ${{ github.ref_name }}
+          # Release 的描述信息，可以使用 markdown
+          body: |
+            🎉 Automated Release ${{ github.ref_name }} 🎉
+
+            This release contains the executable builds for Windows, macOS, and Linux.
+
+            **Downloads:**
+            - [Windows]
+            - [macOS]
+            - [Linux]
+
+            See full changes in ${{ github.ref_name }}.
+
+          # 指定要作为附件上传的文件列表
+          files: |
+            ./artifacts/your-app-windows/* # 替换为你的 Windows 构建产物在 artifacts 目录下的实际路径和名称
+            ./artifacts/your-app-macos/* # 替换为你的 macOS 构建产物在 artifacts 目录下的实际路径和名称
+            ./artifacts/your-app-linux/* # 替换为你的 Linux 构建产物在 artifacts 目录下的实际路径和名称
+            # 如果有其他通用文件需要添加到所有 Release，也可以添加到这里
+
+        env:
+          # GitHub 提供的内置 Token，用于授权创建 Release
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
