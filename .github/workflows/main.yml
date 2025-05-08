@@ -4,7 +4,8 @@ name: Build and Release Executables
 on:
   push:
     branches:
-      - master # 当代码推送到 main 分支时触发构建
+      - main # 当代码推送到 main 分支时触发构建
+      - master # 也监听 master 分支，根据你的截图添加
     tags:
       - 'v*' # 当推送以 'v' 开头的标签时触发构建和发布
   pull_request:
@@ -37,14 +38,20 @@ jobs:
       - name: Build Windows executable
         run: npm install -g pkg && pkg . -t node18-win-x64 # 如果 pkg 是 devDependency，可省略全局安装部分并使用 npm run your-pkg-script
 
+      # --- 临时调试步骤：列出 Windows 构建后的文件，帮助找到可执行文件路径 ---
+      - name: List files after Windows build (for debugging)
+        run: dir /s # 在 Windows 上使用 dir /s 来查看文件树
+        shell: cmd # 确保使用 cmd shell 执行 dir 命令
+      # ----------------------------------------------------------------------
+
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
           name: your-app-windows # Artifact 的名称
-          # 请根据你的 pkg 配置调整路径。如果 pkg . 生成的可执行文件在当前目录，名称为 package.json 的 name + -win.exe
+          # >>> 请根据上面调试步骤 (List files after Windows build) 的输出来替换下面的路径 <<<
           path: |
             ./your-app-win.exe # 替换为你的 Windows 可执行文件实际路径和名称
-            # 如果有其他需要一起打包上传的 Windows 相关文件，也可以添加到这里
+          # 如果有其他需要一起打包上传的 Windows 相关文件，也可以添加到这里
 
   build-macos:
     name: Build on macOS
@@ -65,14 +72,19 @@ jobs:
       - name: Build macOS executable
         run: npm install -g pkg && pkg . -t node18-macos-x64 # 或使用 npm run your-pkg-script
 
+      # --- 临时调试步骤：列出 macOS 构建后的文件，帮助找到可执行文件路径 ---
+      - name: List files after macOS build (for debugging)
+        run: ls -lR # 在 macOS 上使用 ls -lR 查看文件树
+      # --------------------------------------------------------------------
+
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
           name: your-app-macos # Artifact 的名称
-          # 请根据你的 pkg 配置调整路径。如果 pkg . 生成的可执行文件在当前目录，名称为 package.json 的 name + -macos
+          # >>> 请根据上面调试步骤 (List files after macOS build) 的输出来替换下面的路径 <<<
           path: |
             ./your-app-macos # 替换为你的 macOS 可执行文件实际路径和名称
-            # 如果有其他需要一起打包上传的 macOS 相关文件，也可以添加到这里
+          # 如果有其他需要一起打包上传的 macOS 相关文件，也可以添加到这里
 
   build-linux:
     name: Build on Linux
@@ -93,14 +105,19 @@ jobs:
       - name: Build Linux executable
         run: npm install -g pkg && pkg . -t node18-linux-x64 # 或使用 npm run your-pkg-script
 
+      # --- 临时调试步骤：列出 Linux 构建后的文件，帮助找到可执行文件路径 ---
+      - name: List files after Linux build (for debugging)
+        run: ls -lR # 在 Linux 上使用 ls -lR 查看文件树
+      # -------------------------------------------------------------------
+
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v4
         with:
           name: your-app-linux # Artifact 的名称
-          # 请根据你的 pkg 配置调整路径。如果 pkg . 生成的可执行文件在当前目录，名称为 package.json 的 name + -linux
+          # >>> 请根据上面调试步骤 (List files after Linux build) 的输出来替换下面的路径 <<<
           path: |
             ./your-app-linux # 替换为你的 Linux 可执行文件实际路径和名称
-            # 如果有其他需要一起打包上传的 Linux 相关文件，也可以添加到这里
+          # 如果有其他需要一起打包上传的 Linux 相关文件，也可以添加到这里
 
   # ==================================================
   # 发布 Job：下载 Artifact 并创建 GitHub Release
@@ -124,8 +141,10 @@ jobs:
         with:
           path: ./artifacts # 将下载的 Artifact 存放到一个名为 artifacts 的文件夹中
 
+      # --- 临时调试步骤：列出下载到 artifacts 目录的文件 ---
       - name: List downloaded artifacts (for debugging)
         run: ls -R ./artifacts # 列出下载的文件，方便调试查看路径
+      # -------------------------------------------------
 
       - name: Create Release
         id: create_release
