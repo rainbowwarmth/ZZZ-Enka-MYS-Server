@@ -3,11 +3,9 @@ import http from 'http';
 import url from 'url';
 import _ from 'lodash';
 import DataGenerator from "./DataGenerator.js"; // 确认路径 './DataGenerator.js' 正确
-import setLog from './lib/log.js';
 const PORT = 63636; // 保持端口一致
 const generator = new DataGenerator(); // 实例化 DataGenerator
-setLog()
-const logger = global.logger
+import {logger} from './lib/log.js'
 
 // --- Helper: 从请求体或URL中提取 UID ---
 function extractUidFromRequest(requestData) {
