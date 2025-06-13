@@ -6,6 +6,7 @@ import DataGenerator from "./DataGenerator.js"; // 确认路径 './DataGenerator
 const PORT = 63636; // 保持端口一致
 const generator = new DataGenerator(); // 实例化 DataGenerator
 import {logger} from './lib/log.js'
+global.logger = logger; // 确保全局 logger 可用
 
 // --- Helper: 从请求体或URL中提取 UID ---
 function extractUidFromRequest(requestData) {
