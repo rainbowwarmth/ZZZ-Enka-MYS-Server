@@ -3,11 +3,35 @@ import http from 'http';
 import url from 'url';
 import _ from 'lodash';
 import DataGenerator from "./DataGenerator.js"; // 确认路径 './DataGenerator.js' 正确
+import {logger} from './lib/log.js'
+import {down} from './lib/down.js'
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const PORT = 63636; // 保持端口一致
 const generator = new DataGenerator(); // 实例化 DataGenerator
-import {logger} from './lib/log.js'
 global.logger = logger; // 确保全局 logger 可用
+await down()
 
+let characterMap = {};
+try {
+  // 使用resolve路径确保路径正确
+  const charJsonPath = join(__dirname, './resources/hakush_data/characters/character.json');
+  const characterData = JSON.parse(fs.readFileSync(charJsonPath, 'utf8'));
+  
+  // 创建角色ID到中文名的映射
+for (const [id, character] of Object.entries(characterData)) {
+    if (character.CHS) {
+      characterMap[id] = character.CHS;
+    }
+  }
+  logger.mark(`[Server] 成功加载角色数据: ${Object.keys(characterMap).length}个角色`);
+} catch (err) {
+  logger.error('[Server] 加载角色数据失败:', err.message)
+}
 // --- Helper: 从请求体或URL中提取 UID ---
 function extractUidFromRequest(requestData) {
     if (requestData?.apiUrl?.query) {
@@ -201,14 +225,14 @@ const server = http.createServer(async (req, res) => { // 标记为 async
                 }
                 return; // 提前退出 end 回调
             }
-
+            const roleName = targetRoleId ? (characterMap[targetRoleId] || `ID:${targetRoleId}`) : "";
             // --- 发送最终响应 ---
             if (!res.headersSent) {
                  logger.info(`[Mock Server] Preparing response for ID ${targetRoleId || uid} with status ${statusCode}:`, JSON.stringify(responseToSend, null, 2)); // 打印将发送的内容
                  res.writeHead(statusCode, { 'Content-Type': 'application/json' });
                  res.end(JSON.stringify(responseToSend));
                  logger.info(`${logPrefix} Sent response with status ${statusCode}.`);
-                 logger.mark(`${logPrefix} ${uid} 的 ${targetRoleId} 角色数据更新完成`)
+                 logger.mark(`${logPrefix} ${uid} 的 ${roleName} 角色数据更新完成`)
             }
 
         });
