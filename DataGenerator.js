@@ -3,7 +3,6 @@ import _ from 'lodash';
 import { getZzzEnkaData } from './lib/enka/query.js'; // 确认路径正确
 import { _enka_data_to_mys_data } from './lib/enka/enka_to_mys.js'; // 确认路径正确
 
-const logger = console; // 或者使用你项目的 logger 实例
 const CACHE_TTL_MS = 5 * 60 * 1000; // 缓存 5 分钟，根据需要调整
 
 class DataGenerator {

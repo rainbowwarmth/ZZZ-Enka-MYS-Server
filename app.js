@@ -208,7 +208,7 @@ const server = http.createServer(async (req, res) => { // 标记为 async
                  res.writeHead(statusCode, { 'Content-Type': 'application/json' });
                  res.end(JSON.stringify(responseToSend));
                  logger.info(`${logPrefix} Sent response with status ${statusCode}.`);
-                 logger.mark(`${logPrefix} ${uid} 的面板数据更新完成`)
+                 logger.mark(`${logPrefix} ${uid} 的 ${targetRoleId} 角色数据更新完成`)
             }
 
         });
